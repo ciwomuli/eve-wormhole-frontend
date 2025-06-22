@@ -4,14 +4,11 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { LOGIN_PATH } from '@vben/constants';
-import { preferences } from '@vben/preferences';
 import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 
-import { ElNotification } from 'element-plus';
 import { defineStore } from 'pinia';
 
-import { getAccessCodesApi, getUserInfoApi, loginApi, logoutApi } from '#/api';
-import { $t } from '#/locales';
+import { esiAuthApi, getUserInfoApi, logoutApi } from '#/api';
 
 export const useAuthStore = defineStore('auth', () => {
   const accessStore = useAccessStore();
@@ -30,9 +27,20 @@ export const useAuthStore = defineStore('auth', () => {
     onSuccess?: () => Promise<void> | void,
   ) {
     // 异步处理用户登录操作并获取 accessToken
-    let userInfo: null | UserInfo = null;
+    const userInfo: null | UserInfo = null;
     try {
-      loginLoading.value = true;
+      const res = await esiAuthApi();
+      const url = res.url;
+      if (url) {
+        // 如果返回了 url，说明需要跳转到 ESI 认证页面
+        // 打开一个小窗口，进入 ESI 认证页面
+        const authWindow = window.open(
+          url,
+          '_blank',
+          'width=800,height=600,scrollbars=yes,resizable=yes',
+        );
+      }
+      /* loginLoading.value = true;
       const { accessToken } = await loginApi(params);
 
       // 如果成功获取到 accessToken
@@ -68,7 +76,7 @@ export const useAuthStore = defineStore('auth', () => {
             type: 'success',
           });
         }
-      }
+      }*/
     } finally {
       loginLoading.value = false;
     }
