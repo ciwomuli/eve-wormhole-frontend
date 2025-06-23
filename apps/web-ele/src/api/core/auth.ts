@@ -26,7 +26,7 @@ export async function loginApi(data: AuthApi.LoginParams) {
 }
 
 export async function submitCode(code: string, state: string) {
-  return requestClient.get('/auth/submit-code', { params: { code, state } });
+  return requestClient.post('/auth/submit-code', { code, state });
 }
 
 /**

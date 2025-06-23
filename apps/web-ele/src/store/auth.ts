@@ -31,14 +31,9 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const res = await esiAuthApi();
       const url = res.url;
+      accessStore.setAccessToken(res.token);
       if (url) {
-        // 如果返回了 url，说明需要跳转到 ESI 认证页面
-        // 打开一个小窗口，进入 ESI 认证页面
-        const authWindow = window.open(
-          url,
-          '_blank',
-          'width=800,height=600,scrollbars=yes,resizable=yes',
-        );
+        window.location.href = url;
       }
       /* loginLoading.value = true;
       const { accessToken } = await loginApi(params);

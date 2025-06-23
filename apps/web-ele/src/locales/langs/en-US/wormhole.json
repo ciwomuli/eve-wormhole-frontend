@@ -1,0 +1,59 @@
+{
+  "submit": {
+    "pageTitle": "Wormhole Information Submission",
+    "pageDescription": "Submit and view wormhole connection information",
+    "formTitle": "Wormhole Information Submission",
+    "tableTitle": "Wormhole Connection List",
+    "form": {
+      "wormholeId": "Wormhole ID",
+      "wormholeIdPlaceholder": "e.g. K162",
+      "sourceSignal": "Source Signal",
+      "sourceSignalPlaceholder": "Source signal",
+      "sourceSystem": "Source System",
+      "sourceSystemPlaceholder": "Auto-detect",
+      "targetSignal": "Target Signal",
+      "targetSignalPlaceholder": "Target signal",
+      "targetSystem": "Target System",
+      "targetSystemPlaceholder": "Auto-detect",
+      "massStatus": "Mass Status",
+      "massStatusPlaceholder": "Mass status",
+      "timeStatus": "Time Status",
+      "timeStatusPlaceholder": "Time status",
+      "submit": "Submit",
+      "reset": "Reset",
+      "validation": {
+        "wormholeIdRequired": "Please enter wormhole ID",
+        "sourceSignalRequired": "Please enter source signal",
+        "targetSignalRequired": "Please enter target signal",
+        "massStatusRequired": "Please select mass status",
+        "timeStatusRequired": "Please select time status"
+      },
+      "message": {
+        "success": "Wormhole information submitted successfully",
+        "error": "Please complete all required information"
+      }
+    },
+    "table": {
+      "wormholeId": "Wormhole ID",
+      "sourceSignal": "Source Signal",
+      "sourceSystem": "Source System",
+      "targetSignal": "Target Signal",
+      "targetSystem": "Target System",
+      "massStatus": "Mass Status",
+      "timeStatus": "Time Status",
+      "submitTime": "Submit Time",
+      "earliestDisappearTime": "Earliest Disappear Time",
+      "latestDisappearTime": "Latest Disappear Time"
+    },
+    "massStatus": {
+      "stable": "Stable",
+      "destab": "Destabilized",
+      "critical": "Critical"
+    },
+    "timeStatus": {
+      "stable": "Stable",
+      "endOfLife": "End of Life"
+    },
+    "unknownSystem": "Unknown System"
+  }
+}

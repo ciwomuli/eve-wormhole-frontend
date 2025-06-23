@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { reactive } from 'vue';
 
+import { useAccessStore } from '@vben/stores';
+
 import { ElMessageBox } from 'element-plus';
 
 import { submitCode } from '#/api';
@@ -16,33 +18,39 @@ function getQuery(val: string | undefined) {
   const query = location.href.slice(Math.max(0, w + 1));
   const vars = query.split('&');
   for (const var_ of vars) {
-    const pair = var_.split('=');
-    if (pair[0] === val) {
-      return pair[1];
+    const idx = var_.indexOf('=');
+    if (idx !== -1) {
+      const key = var_.slice(0, idx);
+      const value = var_.slice(idx + 1);
+      if (key === val) {
+        return decodeURIComponent(value);
+      }
     }
   }
 
   return false;
 }
-
-submitCode(getQuery('code') as string, getQuery('state') as string)
-  .then(() => {
+const accessStore = useAccessStore();
+/* ElMessageBox.alert(String(accessStore.getAccessToken() ?? ''), {
+  title: '操作',
+  callback: () => {
     closeThis();
+  },
+});
+*/
+submitCode(getQuery('code') as string, getQuery('state') as string)
+  .then((res) => {
+    accessStore.setAccessToken(res.token);
+    window.location.href = '/dashboard';
   })
   .catch((error: Error) => {
-    ElMessageBox.alert((error as Error).message, {
+    ElMessageBox.alert(error.message, {
       title: '操作',
       callback: () => {
-        closeThis();
+        window.location.href = '/auth/login';
       },
     });
   });
-
-function closeThis() {
-  window.opener = null;
-  window.open('', '_self');
-  window.close();
-}
 </script>
 
 <template>

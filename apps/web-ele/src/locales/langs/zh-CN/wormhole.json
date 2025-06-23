@@ -1,0 +1,59 @@
+{
+  "submit": {
+    "pageTitle": "虫洞信息提交",
+    "pageDescription": "提交和查看虫洞连接信息",
+    "formTitle": "虫洞信息提交",
+    "tableTitle": "虫洞连接列表",
+    "form": {
+      "wormholeId": "虫洞编号",
+      "wormholeIdPlaceholder": "如K162",
+      "sourceSignal": "起点信号",
+      "sourceSignalPlaceholder": "起点信号",
+      "sourceSystem": "起点星系",
+      "sourceSystemPlaceholder": "自动识别",
+      "targetSignal": "终点信号",
+      "targetSignalPlaceholder": "终点信号",
+      "targetSystem": "终点星系",
+      "targetSystemPlaceholder": "自动识别",
+      "massStatus": "质量状态",
+      "massStatusPlaceholder": "质量状态",
+      "timeStatus": "时间状态",
+      "timeStatusPlaceholder": "时间状态",
+      "submit": "提交",
+      "reset": "重置",
+      "validation": {
+        "wormholeIdRequired": "请输入虫洞编号",
+        "sourceSignalRequired": "请输入起点信号",
+        "targetSignalRequired": "请输入终点信号",
+        "massStatusRequired": "请选择质量状态",
+        "timeStatusRequired": "请选择时间状态"
+      },
+      "message": {
+        "success": "虫洞信息提交成功",
+        "error": "请填写完整的虫洞信息"
+      }
+    },
+    "table": {
+      "wormholeId": "虫洞编号",
+      "sourceSignal": "起点信号",
+      "sourceSystem": "起点星系",
+      "targetSignal": "终点信号",
+      "targetSystem": "终点星系",
+      "massStatus": "质量状态",
+      "timeStatus": "时间状态",
+      "submitTime": "提交时间",
+      "earliestDisappearTime": "最早消失时间",
+      "latestDisappearTime": "最晚消失时间"
+    },
+    "massStatus": {
+      "stable": "稳定",
+      "destab": "不稳定",
+      "critical": "临界"
+    },
+    "timeStatus": {
+      "stable": "稳定",
+      "endOfLife": "生命终结"
+    },
+    "unknownSystem": "未知星系"
+  }
+}
