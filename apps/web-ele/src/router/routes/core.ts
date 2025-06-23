@@ -90,6 +90,14 @@ const coreRoutes: RouteRecordRaw[] = [
           title: $t('page.auth.register'),
         },
       },
+      {
+        name: 'Wait',
+        path: 'wait',
+        component: () => import('#/views/esi/wait.vue'),
+        meta: {
+          title: $t('page.auth.wait'),
+        },
+      },
     ],
   },
 ];

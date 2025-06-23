@@ -25,6 +25,10 @@ export async function loginApi(data: AuthApi.LoginParams) {
   return requestClient.post<AuthApi.LoginResult>('/auth/login', data);
 }
 
+export async function submitCode(code: string, state: string) {
+  return requestClient.get('/auth/submit-code', { params: { code, state } });
+}
+
 /**
  * 刷新accessToken
  */
