@@ -13,12 +13,13 @@ import {
   ElForm,
   ElFormItem,
   ElInput,
-  ElMessage,
   ElOption,
   ElSelect,
   ElTable,
   ElTableColumn,
 } from 'element-plus';
+
+import { addWormholeApi, listWormholeUserApi } from '#/api';
 
 const { apiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
 
@@ -57,14 +58,15 @@ const formData = reactive<WormholeData>({
 
 // 定义下拉选项
 const massStatusOptions: StatusOption[] = [
-  { value: 'stable', label: t('wormhole.submit.massStatus.stable') },
-  { value: 'destab', label: t('wormhole.submit.massStatus.destab') },
-  { value: 'critical', label: t('wormhole.submit.massStatus.critical') },
+  { value: '0', label: t('wormhole.submit.massStatus.stable') },
+  { value: '1', label: t('wormhole.submit.massStatus.destab') },
+  { value: '2', label: t('wormhole.submit.massStatus.critical') },
 ];
 
 const timeStatusOptions: StatusOption[] = [
-  { value: 'stable', label: t('wormhole.submit.timeStatus.stable') },
-  { value: 'end-of-life', label: t('wormhole.submit.timeStatus.endOfLife') },
+  { value: '0', label: t('wormhole.submit.timeStatus.stable') },
+  { value: '1', label: t('wormhole.submit.timeStatus.endOfLife') },
+  { value: '2', label: t('wormhole.submit.timeStatus.expired') },
 ];
 
 // 表格数据
@@ -107,34 +109,69 @@ const tableData = ref<WormholeData[]>([
   },
 ]);
 
+async function refreshTable() {
+  const data = await listWormholeUserApi();
+  tableData.value = [];
+  for (const item of data) {
+    // 将Unix时间戳转换为可读的日期时间字符串
+    const formatTimestamp = (
+      timestamp: number | string | undefined,
+    ): string => {
+      if (!timestamp) return '';
+      const date = new Date(Number(timestamp) * 1000); // 将秒转换为毫秒
+
+      // 获取当前浏览器的时区
+      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      return date
+        .toLocaleString(navigator.language, {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+          timeZone: userTimeZone,
+        })
+        .replaceAll('/', '-');
+    };
+
+    tableData.value.push({
+      wormholeId: item.type,
+      sourceSignal: item.from_signal,
+      sourceSystem: item.from_system_name,
+      targetSignal: item.to_signal,
+      targetSystem: item.to_system_name,
+      massStatus:
+        massStatusOptions[`${item.mass_status as number}`]?.label || '',
+      timeStatus:
+        timeStatusOptions[`${item.time_status as number}`]?.label || '',
+      submitTime: formatTimestamp(item.status_update_time),
+      earliestDisappearTime: formatTimestamp(item.stable_time_min),
+      latestDisappearTime: formatTimestamp(item.stable_time_max),
+    });
+  }
+}
+
 // 表单引用
 const formRef = ref();
-
+let fromSystemId: number, toSystemId: number;
 // 提交表单
-function submitForm() {
-  formRef.value.validate((valid: boolean) => {
+async function submitForm() {
+  formRef.value.validate(async (valid: boolean) => {
     if (valid) {
-      // 计算最早和最晚消失时间（实际应该根据具体规则计算）
-      const now = new Date();
-      const earliestDisappearTime = new Date(
-        now.getTime() + 24 * 60 * 60 * 1000,
-      ); // 示例：24小时后
-      const latestDisappearTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 示例：48小时后
-
-      // 添加到表格
-      tableData.value.push({
-        ...formData,
-        earliestDisappearTime: earliestDisappearTime.toLocaleString(),
-        latestDisappearTime: latestDisappearTime.toLocaleString(),
-        submitTime: now.toLocaleString(),
-      });
-
-      ElMessage.success(t('wormhole.submit.form.message.success'));
-
-      // 清空表单
-      resetForm();
-    } else {
-      ElMessage.error(t('wormhole.submit.form.message.error'));
+      const data = {
+        type: formData.wormholeId,
+        from_system_id: fromSystemId,
+        from_signal: formData.sourceSignal,
+        to_system_id: toSystemId,
+        to_signal: formData.targetSignal,
+        mass_status: Number.parseInt(formData.massStatus),
+        time_status: Number.parseInt(formData.timeStatus),
+      };
+      await addWormholeApi(data);
+      await refreshTable();
     }
   });
 }
@@ -199,8 +236,7 @@ const wsConnected = ref(false);
 function createWebSocketConnection() {
   if (ws) return; // 避免重复连接
 
-  // 获取当前网站基础URL，确保WebSocket协议匹配
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  // 获取当前网站基础URL
   const accessStore = useAccessStore();
   const accessToken = `Bearer ${accessStore.getAccessToken()}`;
   // 获取当前网站域名和端口
@@ -230,6 +266,8 @@ function createWebSocketConnection() {
         if (data.type !== 'wormhole') {
           return; // 只处理 wormhole 类型的消息
         }
+        fromSystemId = data.fromSystemId;
+        toSystemId = data.toSystemId;
         formData.sourceSystem = data.fromSystemName || '';
         formData.targetSystem = data.toSystemName || '';
       } catch (error) {
@@ -282,6 +320,7 @@ function handleBeforeUnload() {
 // 在组件挂载时建立连接，并添加事件监听
 onMounted(() => {
   createWebSocketConnection();
+  refreshTable();
   document.addEventListener('visibilitychange', handleVisibilityChange);
   window.addEventListener('beforeunload', handleBeforeUnload);
 });
